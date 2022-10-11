@@ -7,7 +7,6 @@ from flask_pymongo import PyMongo
 from sympy.parsing.sympy_parser import *
 import pymongo
 
-
 app = Flask(__name__)
 
 client =  MongoClient('localhost', 27017)
@@ -55,7 +54,7 @@ def step4(a,b,c):
 
 
 
-@app.route("/", methods=["POST", "GET"])
+@app.route("/", methods=["POST", "GET"]  )
 
 def eq():
     if request.method == "POST":
@@ -102,9 +101,9 @@ def eq():
             FinalAnswer= X+" "+Y
         ),200)
     else:
-        return render_template("eq.html")
+        return render_template('eq.html')
 
 
 
 if __name__ == '__main__':
-    app.run(port=3002 )
+    app.run( debug=True, Port=3002)

@@ -1,4 +1,7 @@
+import json
 import time
+
+from bson import json_util
 from pymongo import MongoClient
 from sympy.solvers import solve
 from sympy import Symbol, Eq, sympify
@@ -59,15 +62,19 @@ def step4(a,b,c):
 def eq():
     if request.method == "POST":
         equation = request.form["equation"]
-        LogTable.insert_one({'question': equation})
 
         # taking standard as ax+by+c = 0
         start = time.time()
         parsed_equation =  parsed_eq(equation)
 
+        search_start = time.time()
         found = SolverDb.SolverTable.find_one( { "equation": str(parsed_equation)+'=0' } )
+        search_end = time.time()
+
+
         if( found != None ):
-            return str(found)
+            LogTable.insert_one({'question': equation, 'Time': search_end - search_start})
+            return json.loads(json_util.dumps(found))
 
         # print("new")
 
@@ -84,12 +91,12 @@ def eq():
         }
         finish = time.time();
 
+        LogTable.insert_one({'question': equation , 'Time' : finish-start+search_end-search_start })
 
         solved = {
             'equation' : str(parsed_equation)+'=0' ,
             'steps' : Steps,
-            'final_result' : X+", "+Y,
-            'TotalTime' : finish - start
+            'final_result' : X+", "+Y
         }
 
         SolverTable.insert_one(solved)
